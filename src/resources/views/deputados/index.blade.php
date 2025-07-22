@@ -1,59 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Deputados e Despesas</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { margin-bottom: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
-        th, td { border: 1px solid #ccc; padding: 8px; }
-        th { background: #eee; }
-        .despesa { background: #f9f9f9; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Deputados e suas Despesas</h1>
+<body class="container py-4" style="background-color: #a4d0f5ff">
 
-    @foreach ($deputados as $deputado)
-        <h2>{{ $deputado->nome }} ({{ $deputado->sigla_partido }} - {{ $deputado->sigla_uf }})</h2>
-        @if ($deputado->despesas->isEmpty())
-            <p><em>Sem despesas cadastradas.</em></p>
-        @else
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ano</th>
-                        <th>Mês</th>
-                        <th>Tipo Despesa</th>
-                        <th>Valor</th>
-                        <th>Fornecedor</th>
-                        <th>Documento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($deputado->despesas as $despesa)
-                        <tr class="despesa">
-                            <td>{{ $despesa->ano }}</td>
-                            <td>{{ $despesa->mes }}</td>
-                            <td>{{ $despesa->tipo_despesa }}</td>
-                            <td>R$ {{ number_format($despesa->valor_documento, 2, ',', '.') }}</td>
-                            <td>{{ $despesa->nome_fornecedor }}</td>
-                            <td>
-                                @if($despesa->url_documento)
-                                    <a href="{{ $despesa->url_documento }}" target="_blank">Link</a>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    @endforeach
+    <h1 class="mb-4">Deputados e suas Despesas</h1>
 
-    {{ $deputados->links() }}
+    <!-- Filtros -->
+    <form method="GET" action="{{ route('deputados.index') }}" class="row mb-4">
+        <div class="col-md-4">
+            <input type="text" name="nome" class="form-control" placeholder="Nome do deputado" value="{{ request('nome') }}">
+        </div>
+        <div class="col-md-3">
+            <select name="uf" class="form-select">
+                <option value="">Todos os estados</option>
+                @foreach ($ufs as $uf)
+                    <option value="{{ $uf }}" {{ request('uf') == $uf ? 'selected' : '' }}>{{ $uf }}</option>
+                @endforeach
+            </select>  
+        </div>
+        <div class="col-md-3">
+            <select name="partido" class="form-select">
+                <option value="">Todos os partidos</option>
+                @foreach ($partidos as $partido)
+                    <option value="{{ $partido }}" {{ request('partido') == $partido ? 'selected' : '' }}>{{ $partido }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </form>
+
+    <!-- Tabela -->
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>Deputado</th>
+                <th>Partido</th>
+                <th>UF</th>
+                <th>Despesas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($deputados as $deputado)
+                <tr>
+                    <td>{{ $deputado->nome }}</td>
+                    <td>{{ $deputado->sigla_partido }}</td>
+                    <td>{{ $deputado->sigla_uf }}</td>
+                    <td>
+                        @if ($deputado->despesas->isEmpty())
+                            <em>Sem despesas</em>
+                        @else
+                            <ul class="mb-0">
+                                @foreach ($deputado->despesas as $despesa)
+                                    <li>
+                                        {{ $despesa->tipo_despesa }} - 
+                                        R$ {{ number_format($despesa->valor_documento, 2, ',', '.') }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="4" class="text-center">Nenhum deputado encontrado.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    
+ 
+      <div>
+   {{ $deputados->withQueryString()->links() }}</div>
+
+ 
 
 </body>
 </html>

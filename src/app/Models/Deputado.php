@@ -10,7 +10,7 @@ class Deputado extends Model
     use HasFactory;
 
     protected $fillable = [
-         'id_api',
+        'id_api',
         'nome',
         'sigla_partido',
         'sigla_uf',

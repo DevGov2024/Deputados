@@ -40,7 +40,7 @@ class SyncDeputados extends Command
 
             $this->info("✅ Deputado sincronizado: {$deputado->nome}");
 
-            // dispara Job para as despesas
+            
             SyncDespesasJob::dispatch($deputado->id_api);
         }
 
