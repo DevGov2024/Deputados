@@ -5,9 +5,9 @@
     <title>Deputados e Despesas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="container py-4" style="background-color: #a4d0f5ff">
+<body class="container py-4" style="background-color: #e5e9ecff">
 
-    <h1 class="mb-4">Deputados e suas Despesas</h1>
+    <h1 class="mb-4 text-center">Deputados e suas Despesas</h1>
 
     <!-- Filtros -->
     <form method="GET" action="{{ route('deputados.index') }}" class="row mb-4">
@@ -51,20 +51,24 @@
                     <td>{{ $deputado->nome }}</td>
                     <td>{{ $deputado->sigla_partido }}</td>
                     <td>{{ $deputado->sigla_uf }}</td>
-                    <td>
-                        @if ($deputado->despesas->isEmpty())
-                            <em>Sem despesas</em>
-                        @else
-                            <ul class="mb-0">
-                                @foreach ($deputado->despesas as $despesa)
-                                    <li>
-                                        {{ $despesa->tipo_despesa }} - 
-                                        R$ {{ number_format($despesa->valor_documento, 2, ',', '.') }}
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
-                    </td>
+                  <td>
+    @if ($deputado->despesas->isEmpty())
+        <em>Sem despesas</em>
+    @else
+        <button class="btn btn-sm btn-secondary mb-2" type="button" 
+                onclick="toggleDespesas('despesas-{{ $deputado->id }}')">
+            Mostrar/Ocultar despesas
+        </button>
+        <ul class="mb-0" id="despesas-{{ $deputado->id }}" style="display: none;">
+            @foreach ($deputado->despesas as $despesa)
+                <li>
+                    {{ $despesa->tipo_despesa }} - 
+                    R$ {{ number_format($despesa->valor_documento, 2, ',', '.') }}
+                </li>
+            @endforeach
+        </ul>
+    @endif
+</td>
                 </tr>
             @empty
                 <tr>
@@ -80,6 +84,15 @@
    {{ $deputados->withQueryString()->links() }}</div>
 
  
-
+ <script>
+    function toggleDespesas(id) {
+        const lista = document.getElementById(id);
+        if (lista.style.display === "none") {
+            lista.style.display = "block";
+        } else {
+            lista.style.display = "none";
+        }
+    }
+</script>
 </body>
 </html>
